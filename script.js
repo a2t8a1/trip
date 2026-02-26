@@ -16,7 +16,8 @@ function renderMarkers() {
     markerEl.style.left = marker.x + "%";
     markerEl.style.top = marker.y + "%";
 
-    markerEl.addEventListener("click", () => {
+    markerEl.addEventListener("click", (e) => {
+      e.stopPropagation();
       showNote(marker, index);
     });
 
@@ -25,6 +26,8 @@ function renderMarkers() {
 }
 
 function showNote(marker, index) {
+  document.querySelectorAll(".note").forEach(n => n.remove());
+
   const noteEl = document.createElement("div");
   noteEl.className = "note";
   noteEl.style.left = marker.x + "%";
@@ -38,14 +41,18 @@ function showNote(marker, index) {
     saveMarkers();
   });
 
-  noteEl.appendChild(textarea);
-  markersContainer.appendChild(noteEl);
+  const deleteBtn = document.createElement("button");
+  deleteBtn.textContent = "Sil";
+  deleteBtn.onclick = () => {
+    markers.splice(index, 1);
+    saveMarkers();
+    renderMarkers();
+    noteEl.remove();
+  };
 
-  setTimeout(() => {
-    document.addEventListener("click", () => {
-      noteEl.remove();
-    }, { once: true });
-  }, 100);
+  noteEl.appendChild(textarea);
+  noteEl.appendChild(deleteBtn);
+  markersContainer.appendChild(noteEl);
 }
 
 map.addEventListener("click", (e) => {
